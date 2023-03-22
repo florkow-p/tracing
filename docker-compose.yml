@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.0.10-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+
+  apm:
+    image: docker.elastic.co/apm/apm-server:7.17.9
+    container_name: apm
+    environment:
+      - output.elasticsearch.hosts=["elasticsearch:9200"]
+    ports:
+      - "8200:8200"
+    networks:
+      - elastic
+
+networks:
+  elastic:

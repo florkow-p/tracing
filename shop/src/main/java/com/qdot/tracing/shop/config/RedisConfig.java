@@ -1,5 +1,6 @@
 package com.qdot.tracing.shop.config;
 
+import com.qdot.tracing.shop.cart.model.Cart;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -13,13 +14,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Bean
-    ReactiveRedisOperations<String, Object> redisOperations(ReactiveRedisConnectionFactory factory) {
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+    ReactiveRedisOperations<String, Cart> redisOperations(ReactiveRedisConnectionFactory factory) {
+        Jackson2JsonRedisSerializer<Cart> serializer = new Jackson2JsonRedisSerializer<>(Cart.class);
 
-        RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder =
+        RedisSerializationContext.RedisSerializationContextBuilder<String, Cart> builder =
                 RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
 
-        RedisSerializationContext<String, Object> context = builder.value(serializer).build();
+        RedisSerializationContext<String, Cart> context = builder.value(serializer).build();
 
         return new ReactiveRedisTemplate<>(factory, context);
     }

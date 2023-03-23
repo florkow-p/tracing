@@ -1,5 +1,34 @@
+server:
+  error:
+    include-message: always
+
 spring:
+  r2dbc:
+    url: r2dbc:postgresql://172.17.0.1/postgres
+    username: postgres
+    password: postgres
+  application:
+    name: shop
   data:
     redis:
       host: 172.17.0.1
       port: 6379
+
+  rabbitmq:
+    host: 172.17.0.1
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        orderCreate-out-0:
+          destination: orderUpdate-in-0
+
+redis:
+  ttl: 20
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0

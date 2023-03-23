@@ -27,9 +27,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.cloud:spring-cloud-stream'
+	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
 	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
-	implementation 'io.micrometer:micrometer-tracing'
+	implementation 'io.projectreactor:reactor-core-micrometer'
+
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
 
 	compileOnly 'org.projectlombok:lombok'
 

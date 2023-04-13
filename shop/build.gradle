@@ -29,11 +29,13 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-stream'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
 
-	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-	runtimeOnly 'org.postgresql:r2dbc-postgresql'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	runtimeOnly 'org.postgresql:postgresql'
 
 	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
 	implementation 'io.projectreactor:reactor-core-micrometer'
+	implementation 'co.elastic.apm:apm-agent-api:1.36.0'
 
 	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
 
@@ -54,3 +56,18 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task buildApp(type: Exec) {
+	commandLine './gradlew', 'clean', 'build'
+}
+
+task buildDocker(type: Exec) {
+	commandLine 'docker', 'build', '--force-rm', '-t', 'shop-service', '.'
+}
+
+task runDocker(type: Exec) {
+	commandLine 'docker', 'run', '-p', '8080:8080', 'shop-service'
+}
+
+buildDocker.dependsOn buildApp
+runDocker.dependsOn buildDocker

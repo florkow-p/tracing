@@ -22,12 +22,13 @@ public class CartHandler {
     private static final String ID_PATH = "cartId";
 
     @Value("${redis.ttl}")
-    private Long ttl;
+    private Duration ttl;
 
     private final ReactiveRedisOperations<String, Cart> redisOperations;
 
     public Mono<Cart> get(final ServerRequest serverRequest) {
         final String id = serverRequest.pathVariable(ID_PATH);
+
         return redisOperations.opsForValue().get(id)
                 .doOnNext(cart -> log.info("found cart for id {}", id))
                 .switchIfEmpty(Mono.error(new CartNotFoundException("Cart Not Found")))
@@ -37,7 +38,7 @@ public class CartHandler {
     public Mono<Cart> create(final ServerRequest serverRequest) {
         return Mono.just(UUID.randomUUID())
                 .map(uuid -> Cart.builder().id(uuid.toString()).build())
-                .delayUntil(cart -> redisOperations.opsForValue().set(cart.getId(), cart, Duration.ofSeconds(ttl)));
+                .delayUntil(cart -> redisOperations.opsForValue().set(cart.getId(), cart, ttl));
     }
 
     public Mono<Cart> addProduct(final ServerRequest serverRequest) {

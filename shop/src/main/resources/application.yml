@@ -3,10 +3,14 @@ server:
     include-message: always
 
 spring:
-  r2dbc:
-    url: r2dbc:postgresql://172.17.0.1/postgres
+  profiles:
+    active:
+      - LOCAL
+  datasource:
+    url: jdbc:postgresql://172.17.0.1/postgres
     username: postgres
     password: postgres
+    driver-class-name: org.postgresql.Driver
   application:
     name: shop
   data:
@@ -23,9 +27,12 @@ spring:
       bindings:
         orderCreate-out-0:
           destination: orderUpdate-in-0
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 redis:
-  ttl: 20
+  ttl: PT30m
 
 management:
   tracing:

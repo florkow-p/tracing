@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Value
-@Jacksonized
 @Builder
+@Jacksonized
 public class Cart {
 
     String id;
 
-    List<Product> products;
+    @Builder.Default
+    List<Product> products = new LinkedList<>();
 
     public void addProduct(final Product product) {
         this.products.add(product);

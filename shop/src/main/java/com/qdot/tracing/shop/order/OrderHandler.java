@@ -1,13 +1,9 @@
 package com.qdot.tracing.shop.order;
 
 import co.elastic.apm.api.ElasticApm;
-import co.elastic.apm.api.Scope;
-import co.elastic.apm.api.Span;
 import com.qdot.tracing.shop.cart.CartHandler;
 import com.qdot.tracing.shop.cart.model.Cart;
 import com.qdot.tracing.shop.order.model.Order;
-import com.qdot.tracing.shop.utils.ContextUtils;
-import io.micrometer.context.ContextSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -20,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 @Service
 @RequiredArgsConstructor
 public class OrderHandler {
+
     private final StreamBridge streamBridge;
     private final CartHandler cartHandler;
     private final OrderRepository orderRepository;
@@ -27,9 +24,9 @@ public class OrderHandler {
     Mono<Order> create(ServerRequest serverRequest) {
         return cartHandler.get(serverRequest)
                 .map(this::buildOrder)
-                .flatMap(order -> Mono.defer(() -> Mono.fromCallable(() -> orderRepository.save(order))))
-                .subscribeOn(Schedulers.boundedElastic())
-                .delayUntil(this::send);
+                .map(orderRepository::save)
+                .delayUntil(this::send)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Order buildOrder(Cart cart) {
@@ -40,25 +37,10 @@ public class OrderHandler {
     }
 
     private Mono<Void> send(Order order) {
-        return Mono.deferContextual(contextView -> {
-            Span span = ElasticApm.currentSpan().startSpan("messaging", "rabbitmq", "send");
-
-            return Mono.fromRunnable(() -> {
-                try (ContextSnapshot.Scope contextSnapshot = ContextUtils.getContextSnapshot(contextView)) {
-                    try (Scope scope = span.activate()) {
-                        span.setName("SEND order event");
-                        span.setServiceTarget("rabbitmq", null);
-                        span.setLabel("myLabel", "value");
-                    }
-
-                    log.info("sending order {}", order.getId());
-                    streamBridge.send("orderCreate-out-0", order);
-
-                    span.end();
-                } catch (Exception e) {
-                    span.captureException(e);
-                }
-            });
+        return Mono.fromRunnable(() -> {
+            ElasticApm.currentTransaction().addCustomContext("OrderId", order.getId().toString());
+            log.info("sending order {}", order.getId());
+            streamBridge.send("submitOrder-out-0", order);
         });
     }
 

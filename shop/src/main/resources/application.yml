@@ -25,14 +25,17 @@ spring:
   cloud:
     stream:
       bindings:
-        orderCreate-out-0:
-          destination: orderUpdate-in-0
+        submitOrder-out-0:
+          destination: submitOrder-in-0
+        updateOrderStatus-out-0:
+          destination: updateOrderStatus-in-0
+
   jpa:
     hibernate:
       ddl-auto: update
 
 redis:
-  ttl: PT30m
+  ttl: PT30h
 
 management:
   tracing:

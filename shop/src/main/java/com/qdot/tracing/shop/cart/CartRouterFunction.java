@@ -26,7 +26,7 @@ public class CartRouterFunction {
     }
 
     HandlerFunction<ServerResponse> createCart(CartHandler cartHandler) {
-        return request -> ServerResponse.ok().body(cartHandler.create(request), Cart.class);
+        return request -> ServerResponse.ok().body(cartHandler.create(), Cart.class);
     }
 
     HandlerFunction<ServerResponse> addProduct(CartHandler cartHandler) {

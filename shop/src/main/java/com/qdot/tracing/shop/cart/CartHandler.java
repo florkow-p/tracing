@@ -35,9 +35,8 @@ public class CartHandler {
                 .doOnError(throwable -> log.error("Cart not found for id {}", id));
     }
 
-    public Mono<Cart> create(final ServerRequest serverRequest) {
-        return Mono.just(UUID.randomUUID())
-                .map(uuid -> Cart.builder().id(uuid.toString()).build())
+    public Mono<Cart> create() {
+        return Mono.just(Cart.builder().id(UUID.randomUUID().toString()).build())
                 .delayUntil(cart -> redisOperations.opsForValue().set(cart.getId(), cart, ttl));
     }
 
@@ -48,7 +47,7 @@ public class CartHandler {
                             cart.addProduct(product);
                             return cart;
                         })
-                );
+                ).delayUntil(cart -> redisOperations.opsForValue().set(cart.getId(), cart, ttl));
     }
 
 }

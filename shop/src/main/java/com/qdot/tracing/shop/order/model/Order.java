@@ -2,10 +2,7 @@ package com.qdot.tracing.shop.order.model;
 
 import com.qdot.tracing.shop.product.model.Product;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +23,7 @@ public class Order {
     @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE)
     List<Product> products;
 
+    @With
     Status status;
 
     public enum Status {

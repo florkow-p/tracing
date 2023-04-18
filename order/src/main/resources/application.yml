@@ -1,0 +1,23 @@
+server:
+  error:
+    include-message: always
+  port: 8081
+
+spring:
+  profiles:
+    active:
+      - LOCAL
+  application:
+    name: order
+
+  rabbitmq:
+    host: 172.17.0.1
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      bindings:
+        submitOrder-out-0:
+          destination: submitOrder-in-0
+        updateOrderStatus-out-0:
+          destination: updateOrderStatus-in-0

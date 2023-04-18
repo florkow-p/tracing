@@ -39,6 +39,8 @@ public class OrderHandler {
     private Mono<Void> send(Order order) {
         return Mono.fromRunnable(() -> {
             ElasticApm.currentTransaction().addCustomContext("OrderId", order.getId().toString());
+            ElasticApm.currentSpan().setLabel("Products", order.getProducts().toString());
+
             log.info("sending order {}", order.getId());
             streamBridge.send("submitOrder-out-0", order);
         });

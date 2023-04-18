@@ -35,10 +35,4 @@ spring:
       ddl-auto: update
 
 redis:
-  ttl: PT30h
-
-management:
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
+  ttl: PT30m

@@ -20,10 +20,11 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE)
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
     List<Product> products;
 
     @With
+    @Enumerated(EnumType.STRING)
     Status status;
 
     public enum Status {

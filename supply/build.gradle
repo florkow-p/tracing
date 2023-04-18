@@ -21,8 +21,12 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.2'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 }
@@ -30,3 +34,18 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task buildApp(type: Exec) {
+	commandLine './gradlew', 'clean', 'build'
+}
+
+task buildDocker(type: Exec) {
+	commandLine 'docker', 'build', '--force-rm', '-t', 'shop-service', '.'
+}
+
+task runDocker(type: Exec) {
+	commandLine 'docker', 'run', '-p', '8082:8082', 'shop-service'
+}
+
+buildDocker.dependsOn buildApp
+runDocker.dependsOn buildDocker

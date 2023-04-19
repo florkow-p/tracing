@@ -1,6 +1,7 @@
 package com.qdot.tracing.shop.order;
 
 import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Scope;
 import com.qdot.tracing.shop.cart.CartHandler;
 import com.qdot.tracing.shop.cart.model.Cart;
 import com.qdot.tracing.shop.order.model.Order;
@@ -38,8 +39,9 @@ public class OrderHandler {
 
     private Mono<Void> send(Order order) {
         return Mono.fromRunnable(() -> {
-            ElasticApm.currentTransaction().addCustomContext("OrderId", order.getId().toString());
-            ElasticApm.currentSpan().setLabel("Products", order.getProducts().toString());
+            try (Scope spanScope = ElasticApm.currentSpan().activate()) {
+                ElasticApm.currentSpan().setLabel("orderId", order.getId().toString());
+            }
 
             log.info("sending order {}", order.getId());
             streamBridge.send("submitOrder-out-0", order);
